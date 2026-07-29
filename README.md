@@ -1,0 +1,116 @@
+# PureLeaf Tea Factory — Test Automation
+
+End-to-end and API test suite for the PureLeaf Tea Factory Management System
+(React + Tailwind frontend, Spring Boot backend, PostgreSQL, Firebase Auth),
+built with **Python + Playwright + pytest**.
+
+## 1. Overview
+
+The suite is split into two layers, following the test pyramid:
+
+- **API tests** (`tests/api/`) — fast, direct HTTP calls against the Spring
+  Boot backend via `playwright.request`. Used for the bulk of business-logic
+  coverage (auth, CRUD, calculations, validation).
+- **UI tests** (`tests/ui/`) — real Chromium browser sessions driving the
+  React frontend, reserved for flows that matter end-to-end: login, and any
+  form that's actually wired to the backend (not every "management" page is —
+  see `UI_TESTS_INTERVIEW_GUIDE.md` for the investigation behind that call).
+
+Both layers cross-verify against PostgreSQL directly (`psycopg2`) where the
+API alone can't confirm a side effect (e.g. a role change, a deleted row).
+
+## 2. Architecture
+
+```
+playwright-tests/
+├── pages/              Page Object Model — one class per real, backend-wired
+│                        UI flow (LoginPage, TeaRatePage, FertilizerStockRequestPage).
+│                        Not every page gets a wrapper: read-only/mock pages have
+│                        no stable interactive surface worth abstracting.
+├── tests/
+│   ├── api/             Backend REST API tests
+│   └── ui/               Browser tests (Playwright + pytest-playwright fixtures)
+├── utils/
+│   └── test_data.py      Loads non-secret fixture data from data/test_data.json
+├── data/
+│   └── test_data.json    Reusable form inputs / sample payloads (no secrets)
+├── screenshots/          Auto-captured on test failure (gitignored)
+├── reports/               HTML test report output (gitignored)
+├── conftest.py            Fixtures: browser config, api_context, db_conn, Firebase auth
+├── pytest.ini              pytest + reporting configuration
+└── requirements.txt
+```
+
+Credentials (test user email/password, Firebase API key) live in `.env` and
+are never committed or duplicated into `data/test_data.json` — that file is
+strictly for non-secret sample values (e.g. a gross-sale-average number, a
+stock-request quantity).
+
+## 3. Installation
+
+```bash
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+
+pip install -r requirements.txt
+playwright install                # downloads Chromium/Firefox/WebKit binaries
+```
+
+Create a `.env` file (see `.env` keys below) with:
+
+```
+FIREBASE_API_KEY=...
+TEST_USER_EMAIL=...
+TEST_USER_PASSWORD=...
+TEST_USER_UID=...
+SLOWMO_MS=0        # optional: ms delay between actions, useful with --headed
+```
+
+The backend (`localhost:8080`) and frontend (`localhost:5174`) must be
+running locally — `conftest.py` points at those URLs.
+
+## 4. Running Tests
+
+```bash
+# Everything (API + UI), headless, Chromium
+pytest
+
+# UI tests only, watch it run
+pytest tests/ui --headed
+
+# A single module / test
+pytest tests/ui/test_login_ui.py -k test_valid_login_redirects_away_from_login_page
+
+# Cross-browser
+pytest --browser firefox
+pytest --browser webkit
+pytest --browser chromium --browser firefox --browser webkit   # all three
+```
+
+## 5. Reporting & Failure Diagnostics
+
+Configured in `pytest.ini`:
+
+- **HTML report** — every run writes `reports/report.html` (self-contained,
+  open directly in a browser). Shows pass/fail per test, duration, and
+  captured output.
+- **Screenshot on failure** — any failing UI test automatically saves a
+  screenshot to `screenshots/`, named after the test.
+
+```bash
+pytest --html=reports/report.html --self-contained-html   # explicit form (also the default via addopts)
+```
+
+## 6. Locator Strategy
+
+Priority order used throughout `pages/` and `tests/`:
+`get_by_role` → `get_by_label` → `get_by_placeholder` → `get_by_text` →
+CSS selector (only where the form has no accessible role/label — several
+forms in this app aren't using `htmlFor`/`id` label association, a known
+frontend gap documented in `UI_TESTS_INTERVIEW_GUIDE.md`).
+
+## 7. Further Reading
+
+- `INTERVIEW_NOTES.md` — API testing walkthrough and findings (Sinhala + English).
+- `UI_TESTS_INTERVIEW_GUIDE.md` — UI testing strategy, why certain pages were
+  skipped, and frontend gaps discovered while writing these tests.

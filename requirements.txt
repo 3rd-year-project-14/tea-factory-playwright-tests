@@ -1,0 +1,5 @@
+pytest-playwright
+pytest-html
+python-dotenv
+requests
+psycopg2-binary

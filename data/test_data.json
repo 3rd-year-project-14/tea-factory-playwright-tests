@@ -1,0 +1,13 @@
+{
+  "invalid_login": {
+    "email": "wrong-user@playwright.com",
+    "password": "wrongPassword"
+  },
+  "tea_rate": {
+    "gross_sale_average": "100"
+  },
+  "fertilizer_stock_request": {
+    "quantity": "25",
+    "notes": "Playwright UI test request"
+  }
+}
