@@ -4,6 +4,9 @@ import pytest
 
 pytestmark = pytest.mark.api
 
+HAS_FIREBASE_AUTH_SECRETS = all(
+    os.environ.get(var) for var in ("FIREBASE_API_KEY", "TEST_USER_EMAIL", "TEST_USER_PASSWORD")
+)
 
 def test_signup_creates_backend_user(api_context, firebase_id_token):
     response = api_context.post(
@@ -22,6 +25,10 @@ def test_signup_creates_backend_user(api_context, firebase_id_token):
 
 
 @pytest.mark.smoke
+@pytest.mark.skipif(
+    not HAS_FIREBASE_AUTH_SECRETS,
+    reason="Requires FIREBASE_API_KEY, TEST_USER_EMAIL, and TEST_USER_PASSWORD secrets",
+)
 def test_login_with_valid_firebase_token(api_context, firebase_id_token):
     response = api_context.post("/api/auth/login", data={"token": firebase_id_token})
 
