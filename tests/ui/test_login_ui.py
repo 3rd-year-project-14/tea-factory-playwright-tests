@@ -9,8 +9,14 @@ from utils.test_data import load_test_data
 
 pytestmark = pytest.mark.ui
 
+HAS_LOGIN_SECRETS = all(os.environ.get(var) for var in ("TEST_USER_EMAIL", "TEST_USER_PASSWORD"))
+
 
 @pytest.mark.smoke
+@pytest.mark.skipif(
+    not HAS_LOGIN_SECRETS,
+    reason="Requires TEST_USER_EMAIL and TEST_USER_PASSWORD secrets",
+)
 def test_valid_login_redirects_away_from_login_page(page: Page):
     login_page = LoginPage(page, FRONTEND_URL).goto()
     login_page.login(os.environ["TEST_USER_EMAIL"], os.environ["TEST_USER_PASSWORD"])
