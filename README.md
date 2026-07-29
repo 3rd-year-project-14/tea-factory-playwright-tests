@@ -134,20 +134,33 @@ pytest --html=reports/report.html --self-contained-html   # explicit form (also 
 
 `.github/workflows/playwright-tests.yml` runs on every push/PR:
 
-1. Spins up a `postgres:16` service container (matches `conftest.py`'s `DB_CONFIG`).
-2. Builds and starts the Spring Boot backend (`mvnw package` + `java -jar`).
-3. Installs and starts the Vite frontend dev server on port 5174.
-4. Waits for both to respond (`wait-on`), then runs `pytest -m smoke -n auto`.
-5. Uploads the HTML report + failure screenshots as build artifacts.
+1. Checks out **three separate repos** as sibling directories on the runner —
+   this test suite, `tea-factory-backend`, and `tea-factory-frontend-web` are
+   not a monorepo, so each needs its own `actions/checkout` step.
+2. Spins up a `postgres:16` service container (matches `conftest.py`'s `DB_CONFIG`).
+3. Builds and starts the Spring Boot backend (`mvnw package` + `java -jar`).
+4. Installs and starts the Vite frontend dev server on port 5174.
+5. Waits for both to respond (`wait-on`), then runs `pytest -m smoke -n auto`.
+6. Uploads the HTML report + failure screenshots as build artifacts.
 
 A second job (`full-regression`) runs the entire suite across all three
 browsers, triggered manually via `workflow_dispatch` (or adjust the `on:`
 block to run it nightly on a schedule).
 
-Requires three repository secrets — `FIREBASE_API_KEY`, `TEST_USER_EMAIL`,
-`TEST_USER_PASSWORD` — since the suite authenticates against a real Firebase
-project (see `conftest.py::firebase_id_token`); this can't be mocked away
-without changing the app's auth flow itself.
+Requires these repository secrets:
+
+- `FIREBASE_API_KEY`, `TEST_USER_EMAIL`, `TEST_USER_PASSWORD` — the suite
+  authenticates against a real Firebase project (see
+  `conftest.py::firebase_id_token`); this can't be mocked away without
+  changing the app's auth flow itself.
+- `FIREBASE_CREDENTIALS` — the backend's `FirebaseConfig.java` needs Admin SDK
+  credentials to verify login tokens. Locally it reads the gitignored
+  `firebase-service-account.json`; that file doesn't exist on the CI runner,
+  so paste its contents **base64-encoded** into this secret (matches the
+  deployed-container path `FirebaseConfig.java` already supports):
+  `base64 -w0 firebase-service-account.json` (macOS: `base64 -i firebase-service-account.json`).
+  Never commit that JSON file or paste its raw contents anywhere outside the
+  GitHub secret field itself — it's an Admin SDK key with full project access.
 
 ## 8. Locator Strategy
 

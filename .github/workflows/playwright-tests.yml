@@ -28,7 +28,26 @@ jobs:
           --health-retries 10
 
     steps:
-      - uses: actions/checkout@v4
+      # This repo (tea-factory-playwright-tests), the backend, and the frontend
+      # are three separate GitHub repos, not one monorepo -- each needs its own
+      # checkout, laid out as siblings on the runner to match the working-directory
+      # paths used below.
+      - name: Checkout test suite
+        uses: actions/checkout@v4
+        with:
+          path: playwright-tests
+
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: 3rd-year-project-14/tea-factory-backend
+          path: tea-factory-backend
+
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+        with:
+          repository: 3rd-year-project-14/tea-factory-frontend-web
+          path: tea-factory-frontend-web
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -46,8 +65,15 @@ jobs:
         with:
           python-version: "3.10"
 
+      # FirebaseConfig.java falls back to the local (gitignored) service-account
+      # JSON file when FIREBASE_CREDENTIALS is unset -- that file doesn't exist on
+      # the runner, so the Admin SDK (used to verify login tokens) needs the
+      # secret passed in directly, base64-encoded, exactly as the deployed-container
+      # path already supports.
       - name: Build & start backend (Spring Boot)
-        working-directory: NewBack/tea-factory-backend
+        working-directory: tea-factory-backend
+        env:
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
         run: |
           ./mvnw -B -q -DskipTests package
           nohup java -jar target/*.jar > backend.log 2>&1 &
@@ -109,7 +135,22 @@ jobs:
           --health-retries 10
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout test suite
+        uses: actions/checkout@v4
+        with:
+          path: playwright-tests
+
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: 3rd-year-project-14/tea-factory-backend
+          path: tea-factory-backend
+
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+        with:
+          repository: 3rd-year-project-14/tea-factory-frontend-web
+          path: tea-factory-frontend-web
 
       - uses: actions/setup-java@v4
         with:
@@ -125,7 +166,9 @@ jobs:
           python-version: "3.10"
 
       - name: Build & start backend
-        working-directory: NewBack/tea-factory-backend
+        working-directory: tea-factory-backend
+        env:
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
         run: |
           ./mvnw -B -q -DskipTests package
           nohup java -jar target/*.jar > backend.log 2>&1 &
