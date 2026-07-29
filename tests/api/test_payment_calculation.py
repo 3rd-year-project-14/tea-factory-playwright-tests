@@ -4,6 +4,9 @@ from decimal import Decimal
 
 import pytest
 
+
+pytestmark = pytest.mark.api
+
 # End-to-end payment calculation flow:
 #   1. A supplier has bag_weight records (net weight) recorded for a month
 #      (built the same way as the flow #4 tea-collection chain).

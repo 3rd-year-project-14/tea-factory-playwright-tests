@@ -1,3 +1,7 @@
+import pytest
+
+pytestmark = pytest.mark.api
+
 def test_get_all_factories(api_context):
     response = api_context.get("/api/factories")
 

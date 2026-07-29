@@ -1,5 +1,6 @@
 pytest-playwright
 pytest-html
+pytest-xdist
 python-dotenv
 requests
 psycopg2-binary

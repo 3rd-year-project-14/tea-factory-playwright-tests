@@ -5,6 +5,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import MOBILE_FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # This drives the supplier-side registration flow from tea-factory-mobile-app (Expo),
 # not the web app -- FactoryManager's web UI only reviews/approves requests that
 # already exist (see tests/ui/test_supplier_registration_ui.py's NOTE). The mobile app

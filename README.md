@@ -85,9 +85,34 @@ pytest tests/ui/test_login_ui.py -k test_valid_login_redirects_away_from_login_p
 pytest --browser firefox
 pytest --browser webkit
 pytest --browser chromium --browser firefox --browser webkit   # all three
+
+# Smoke subset only (login + auth + health check) -- fast sanity check
+pytest -m smoke
+
+# Everything except smoke (full regression pool)
+pytest -m "not smoke"
+
+# API-only / UI-only
+pytest -m api
+pytest -m ui
+
+# Parallel execution (pytest-xdist) -- distributes tests across workers
+pytest -n auto        # one worker per CPU core
+pytest -n 4            # explicit worker count
 ```
 
-## 5. Reporting & Failure Diagnostics
+## 5. Test Organization (Markers)
+
+Registered in `pytest.ini`:
+
+| Marker | Meaning |
+|---|---|
+| `smoke` | Critical-path tests (login, auth, health check) — run on every push |
+| `regression` | Everything else — full functional coverage |
+| `api` | Backend REST API tests (applied file-wide via `pytestmark` in `tests/api/`) |
+| `ui` | Browser-driven frontend tests (applied file-wide via `pytestmark` in `tests/ui/`) |
+
+## 6. Reporting & Failure Diagnostics
 
 Configured in `pytest.ini`:
 
@@ -96,12 +121,35 @@ Configured in `pytest.ini`:
   captured output.
 - **Screenshot on failure** — any failing UI test automatically saves a
   screenshot to `screenshots/`, named after the test.
+- **Structured execution log** — `conftest.py` hooks `pytest_runtest_makereport`
+  to write one line per test (`PASSED`/`FAILED`/`SKIPPED`, duration, full
+  node ID) to `reports/test_execution.log`, independent of console output —
+  useful for CI log inspection without re-running.
 
 ```bash
 pytest --html=reports/report.html --self-contained-html   # explicit form (also the default via addopts)
 ```
 
-## 6. Locator Strategy
+## 7. CI/CD
+
+`.github/workflows/playwright-tests.yml` runs on every push/PR:
+
+1. Spins up a `postgres:16` service container (matches `conftest.py`'s `DB_CONFIG`).
+2. Builds and starts the Spring Boot backend (`mvnw package` + `java -jar`).
+3. Installs and starts the Vite frontend dev server on port 5174.
+4. Waits for both to respond (`wait-on`), then runs `pytest -m smoke -n auto`.
+5. Uploads the HTML report + failure screenshots as build artifacts.
+
+A second job (`full-regression`) runs the entire suite across all three
+browsers, triggered manually via `workflow_dispatch` (or adjust the `on:`
+block to run it nightly on a schedule).
+
+Requires three repository secrets — `FIREBASE_API_KEY`, `TEST_USER_EMAIL`,
+`TEST_USER_PASSWORD` — since the suite authenticates against a real Firebase
+project (see `conftest.py::firebase_id_token`); this can't be mocked away
+without changing the app's auth flow itself.
+
+## 8. Locator Strategy
 
 Priority order used throughout `pages/` and `tests/`:
 `get_by_role` → `get_by_label` → `get_by_placeholder` → `get_by_text` →
@@ -109,7 +157,7 @@ CSS selector (only where the form has no accessible role/label — several
 forms in this app aren't using `htmlFor`/`id` label association, a known
 frontend gap documented in `UI_TESTS_INTERVIEW_GUIDE.md`).
 
-## 7. Further Reading
+## 9. Further Reading
 
 - `INTERVIEW_NOTES.md` — API testing walkthrough and findings (Sinhala + English).
 - `UI_TESTS_INTERVIEW_GUIDE.md` — UI testing strategy, why certain pages were

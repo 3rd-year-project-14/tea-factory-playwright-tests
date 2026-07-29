@@ -5,6 +5,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # AppRouter.jsx has no ProtectedRoute/redirect-on-wrong-role wrapper -- role-based
 # access is just conditional route mounting:
 #   {user?.role === "FACTORY_MANAGER" && FactoryManagerRoutes}

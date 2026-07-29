@@ -5,6 +5,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # Read-only smoke test: InventoryRoutesPage.jsx falls back to dummy data
 # (inventoryData.jsx) if the live API call fails, so this only asserts the dashboard
 # chrome renders correctly, not any specific numbers -- those depend on whatever

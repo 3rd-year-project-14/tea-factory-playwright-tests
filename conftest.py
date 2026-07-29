@@ -1,3 +1,4 @@
+import logging
 import os
 
 import psycopg2
@@ -6,6 +7,19 @@ import requests
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger("test_execution")
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Writes a PASSED/FAILED/SKIPPED line per test to reports/test_execution.log
+    (see pytest.ini's --log-file), independent of the HTML report and console output."""
+    outcome = yield
+    report = outcome.get_result()
+    if report.when == "call" or (report.when == "setup" and report.outcome != "passed"):
+        status = report.outcome.upper()
+        logger.info("%s %s (%.2fs)", status, item.nodeid, report.duration)
 
 BASE_URL = "http://localhost:8080"
 FRONTEND_URL = "http://localhost:5174"

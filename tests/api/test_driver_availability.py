@@ -2,6 +2,9 @@ import uuid
 
 import pytest
 
+
+pytestmark = pytest.mark.api
+
 # The service enforces one availability record per driver per day (POST fails with 400
 # if one already exists for "today"), so each test uses its own throwaway driver row
 # rather than sharing driver_id=1 with other tests/runs.

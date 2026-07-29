@@ -1,3 +1,7 @@
+import pytest
+
+pytestmark = pytest.mark.api
+
 def test_create_trip_for_driver_and_route(api_context):
     response = api_context.post("/api/trips", data={"driverId": 1, "routeId": 1})
 

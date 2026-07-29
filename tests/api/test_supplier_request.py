@@ -3,6 +3,9 @@ import uuid
 import pytest
 
 
+pytestmark = pytest.mark.api
+
+
 # NOTE: POST /api/supplier-requests (creating a request) uploads the NIC image to
 # Firebase Storage, and that project's billing account is currently disabled, so the
 # real create endpoint returns 500 regardless of payload. These tests set up the

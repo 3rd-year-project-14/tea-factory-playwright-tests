@@ -6,6 +6,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # Real, backend-wired flow: addManagers.jsx creates a Firebase account
 # (createUserWithEmailAndPassword) then POSTs to /api/users. Same environment
 # tolerance as tests/ui/test_driver_vehicle_ui.py's driver-creation test: the Firebase

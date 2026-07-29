@@ -6,6 +6,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # NOTE: There is no "Add Supplier" / registration form anywhere in the FactoryManager
 # Suppliers UI -- SupplierRegister.jsx only ever renders the approve/reject table for
 # requests that already exist (created via the supplier-facing /api/supplier-requests

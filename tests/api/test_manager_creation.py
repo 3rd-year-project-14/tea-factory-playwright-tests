@@ -2,6 +2,9 @@ import uuid
 
 import pytest
 
+
+pytestmark = pytest.mark.api
+
 # There is no manager-specific create endpoint (ManagerController is read-only).
 # Manager accounts are created through the generic UserController with role=FACTORY_MANAGER
 # (or any of the other *_MANAGER roles). This flow found and fixed a real bug: the service

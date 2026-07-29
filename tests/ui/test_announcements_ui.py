@@ -6,6 +6,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # Real, backend-wired form: addAnnouncement.jsx POSTs multipart/form-data to
 # /api/announcements (field names topic/subject/content/factories/attachments match
 # tests/api/test_announcements.py exactly). No success alert/toast exists -- on

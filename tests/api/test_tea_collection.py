@@ -3,6 +3,9 @@ from datetime import date, datetime
 
 import pytest
 
+
+pytestmark = pytest.mark.api
+
 # This test simulates the full physical tea-collection chain:
 #   supplier requests pickup -> driver's trip is linked to that request ->
 #   driver logs bags picked up (trip-bags) -> inventory manager opens a

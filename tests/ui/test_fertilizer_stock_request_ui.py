@@ -9,6 +9,9 @@ from pages.fertilizer_stock_request_page import FertilizerStockRequestPage
 from pages.login_page import LoginPage
 from utils.test_data import load_test_data
 
+
+pytestmark = pytest.mark.ui
+
 # This is the real, backend-wired form (unlike CreateRoute.jsx or the fertilizer
 # approve/reject pages, which turned out to be mock/dead-code). It submits via
 # POST /api/fertilizer-requests/fertilizer-stock-requests -- a *different* backend

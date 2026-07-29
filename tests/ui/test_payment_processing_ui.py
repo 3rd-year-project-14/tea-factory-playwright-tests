@@ -7,6 +7,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # GAP FOUND (not fixed -- out of scope for this test to implement): the "Adhoc"
 # payment approval screen (PaymentManager/PaymentProceed/AdhocPaymentProcessing.jsx,
 # mounted at /factoryManager/payment/proceed/adhoc) filters the payments it fetches by

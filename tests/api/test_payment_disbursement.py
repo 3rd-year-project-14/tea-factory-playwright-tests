@@ -3,6 +3,9 @@ from decimal import Decimal
 
 import pytest
 
+
+pytestmark = pytest.mark.api
+
 # These tests found and drove the fix for two real backend bugs (see PaymentService.java
 # disburseCash / generateBankCsv, and CashCollectionBatch.java / Payment.java entities):
 #   1. CashCollectionBatch.batchNumber and BankCsvBatch.batchNumber (NOT NULL, unique)

@@ -6,6 +6,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # GAP FOUND (not fixed -- out of scope for this test to implement): AddVehicle.jsx's
 # handleSubmit is not wired to the backend at all -- it just alert()s a JSON dump of
 # the form and never calls the vehicles API (POST /api/vehicles, covered in

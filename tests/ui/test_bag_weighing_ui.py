@@ -7,6 +7,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # Mirrors the setup chain in tests/api/test_tea_collection.py: supplier -> pickup
 # request -> trip-supplier link -> a bag generated and logged by the driver -> a
 # weighing session opened for the trip. The UI page under test

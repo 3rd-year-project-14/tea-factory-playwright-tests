@@ -1,5 +1,9 @@
 import uuid
 
+import pytest
+
+pytestmark = pytest.mark.api
+
 
 def test_create_route(api_context):
     route_code = f"PW-{uuid.uuid4().hex[:8]}"

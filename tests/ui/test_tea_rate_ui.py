@@ -1,11 +1,14 @@
 import os
 
+import pytest
 from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 from pages.login_page import LoginPage
 from pages.tea_rate_page import TeaRatePage
 from utils.test_data import load_test_data
+
+pytestmark = pytest.mark.ui
 
 # NOTE: PaymentManagerRoutes (including /payment-manager/tea-rates) is mounted
 # unconditionally in AppRouter.jsx -- {PaymentManagerRoutes} is included with no

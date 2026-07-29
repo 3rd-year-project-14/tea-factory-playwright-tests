@@ -6,6 +6,9 @@ from playwright.sync_api import Page, expect
 
 from conftest import FRONTEND_URL
 
+
+pytestmark = pytest.mark.ui
+
 # GAP FOUND (not fixed -- this is a frontend feature gap, out of this test's scope to
 # implement): CreateRoute.jsx's Submit button is `type="button"` and its onClick handler
 # only does `console.log(...)` -- it never calls the backend POST /api/routes endpoint,

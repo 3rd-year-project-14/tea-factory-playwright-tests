@@ -1,5 +1,9 @@
 import os
 
+import pytest
+
+pytestmark = pytest.mark.api
+
 
 def test_signup_creates_backend_user(api_context, firebase_id_token):
     response = api_context.post(
@@ -17,6 +21,7 @@ def test_signup_creates_backend_user(api_context, firebase_id_token):
     assert response.status == 200
 
 
+@pytest.mark.smoke
 def test_login_with_valid_firebase_token(api_context, firebase_id_token):
     response = api_context.post("/api/auth/login", data={"token": firebase_id_token})
 
@@ -27,6 +32,7 @@ def test_login_with_valid_firebase_token(api_context, firebase_id_token):
     assert body["role"] is not None
 
 
+@pytest.mark.smoke
 def test_login_with_invalid_token_is_rejected(api_context):
     response = api_context.post("/api/auth/login", data={"token": "this-is-not-a-real-token"})
 

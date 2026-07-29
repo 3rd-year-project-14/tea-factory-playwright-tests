@@ -2,6 +2,9 @@ import uuid
 
 import pytest
 
+
+pytestmark = pytest.mark.api
+
 # BankDetailsController only exposes GET endpoints -- there is no POST/PUT/DELETE
 # anywhere in the codebase for bank_details (confirmed by grepping every controller).
 # So these tests seed data directly via SQL (the only way it can exist) and verify

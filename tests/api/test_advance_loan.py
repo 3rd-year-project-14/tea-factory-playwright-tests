@@ -2,6 +2,9 @@ import uuid
 
 import pytest
 
+
+pytestmark = pytest.mark.api
+
 # Advance and loan-request flows share one prerequisite: an existing SUPPLIER.
 # NOTE: the advance /approve endpoint is annotated @PreAuthorize("hasRole('FACTORY_MANAGER')").
 # Because the Firebase auth filter is disabled in this environment (SecurityConfig permits

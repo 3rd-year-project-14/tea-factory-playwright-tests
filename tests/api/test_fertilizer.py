@@ -2,6 +2,9 @@ import uuid
 
 import pytest
 
+
+pytestmark = pytest.mark.api
+
 # This flow found a real gap: approving a supplier fertilizer request never touched
 # FertilizerStock.quantity, so stock could be "issued" infinitely. Fixed in
 # SupplierFertilizerRequestService.updateRequest -> issueStockForApprovedRequest():

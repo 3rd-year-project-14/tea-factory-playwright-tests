@@ -1,3 +1,7 @@
+import pytest
+
+pytestmark = pytest.mark.api
+
 def test_factory_dashboard_summary_shape(api_context):
     response = api_context.get("/api/inventory-process/1/dashboard-summary")
 
